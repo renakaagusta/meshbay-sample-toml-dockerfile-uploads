@@ -1,0 +1,29 @@
+# One service. Postgres is added from the Meshbay database catalog and wired
+# into the app as the DATABASE_URL variable (see README).
+#
+# No [services.env] block on purpose: manifest env is dropped once a variable is
+# edited (gap G3 in the README), so the app carries defaults for PORT, DATA_DIR,
+# APP_VERSION and LOG_LEVEL instead.
+#
+# The uploads volume keeps DATA_DIR across redeploys. replicas stays at 1
+# because a named volume lives on one machine.
+
+[[services]]
+name = "app"
+ports = ["8080"]
+replicas = 1
+volumes = ["uploads:/data"]
+
+[services.build]
+dockerfile = "Dockerfile"
+
+[services.resources]
+cpus = 0.5
+memory = "256M"
+
+[services.healthcheck]
+path = "/health"
+interval = "10s"
+timeout = "5s"
+start_period = "20s"
+retries = 5
